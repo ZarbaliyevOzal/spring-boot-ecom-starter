@@ -29,7 +29,7 @@ public class UserService {
 
         User user = userMapper.toEntity(userRequestDTO);
         // hash password
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
         // save user
         User saved = userRepository.save(user);
         return userMapper.toDTO(saved);
