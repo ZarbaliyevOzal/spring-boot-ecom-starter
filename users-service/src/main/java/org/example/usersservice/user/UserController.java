@@ -5,6 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.example.usersservice.user.dto.UserRequestDTO;
 import org.example.usersservice.user.dto.UserResponseDTO;
 import org.example.usersservice.user.dto.UserUpdateDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,5 +45,21 @@ public class UserController {
     public ResponseEntity<Map<String, String>> restoreUser(@PathVariable Long id) {
         userService.restoreUser(id);
         return ResponseEntity.ok().body(Map.of("message", "User successfully restored"));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> findUser(@PathVariable Long id) {
+        UserResponseDTO user = userService.findUser(id);
+        return ResponseEntity.ok().body(user);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<UserResponseDTO>> getUsers(
+            @RequestParam(required = false, defaultValue = "1") int page,
+            @RequestParam(required = false, defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        Page<UserResponseDTO> users = userService.getUsers(pageable);
+        return ResponseEntity.ok().body(users);
     }
 }

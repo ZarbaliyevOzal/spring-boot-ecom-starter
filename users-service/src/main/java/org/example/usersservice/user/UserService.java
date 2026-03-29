@@ -7,6 +7,8 @@ import org.example.usersservice.exception.FieldValidationException;
 import org.example.usersservice.user.dto.UserRequestDTO;
 import org.example.usersservice.user.dto.UserResponseDTO;
 import org.example.usersservice.user.dto.UserUpdateDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -71,5 +73,22 @@ public class UserService {
         if (user.getDeletedAt() == null) return;
         user.setDeletedAt(null);
         userRepository.save(user);
+    }
+
+    public UserResponseDTO findUser(Long id) {
+        User user = userRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        return userMapper.toDTO(user);
+    }
+
+    public Page<UserResponseDTO> getUsers(Pageable pageable) {
+        Page<User> users = userRepository.findAllByDeletedAtIsNull(pageable);
+
+        return users.map(user -> new UserResponseDTO(
+                    user.getId(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getEmail()
+            ));
     }
 }
