@@ -36,4 +36,10 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.ok().body(Map.of("message", "User successfully deleted"));
     }
+
+    @PatchMapping("/{id}/restore")
+    public ResponseEntity<Map<String, String>> restoreUser(@PathVariable Long id) {
+        userService.restoreUser(id);
+        return ResponseEntity.ok().body(Map.of("message", "User successfully restored"));
+    }
 }

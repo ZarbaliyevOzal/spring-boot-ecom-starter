@@ -65,4 +65,11 @@ public class UserService {
         user.setDeletedAt(Instant.now());
         userRepository.save(user);
     }
+
+    public void restoreUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
+        if (user.getDeletedAt() == null) return;
+        user.setDeletedAt(null);
+        userRepository.save(user);
+    }
 }
