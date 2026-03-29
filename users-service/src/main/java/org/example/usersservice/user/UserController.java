@@ -4,12 +4,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.usersservice.user.dto.UserRequestDTO;
 import org.example.usersservice.user.dto.UserResponseDTO;
+import org.example.usersservice.user.dto.UserUpdateDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -22,5 +22,12 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody @Valid UserRequestDTO userRequestDTO) {
         UserResponseDTO createdUser = userService.createUser(userRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Map<String, String>> updateUser(@PathVariable Long id,
+                                                          @RequestBody @Valid UserUpdateDTO userUpdateDTO) {
+        userService.updateUser(id, userUpdateDTO);
+        return ResponseEntity.ok().body(Map.of("message", "User successfully updated"));
     }
 }
