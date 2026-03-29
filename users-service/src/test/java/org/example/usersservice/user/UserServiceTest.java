@@ -1,5 +1,6 @@
 package org.example.usersservice.user;
 
+import org.example.usersservice.exception.EntityNotFoundException;
 import org.example.usersservice.exception.FieldValidationException;
 import org.example.usersservice.user.dto.UserRequestDTO;
 import org.example.usersservice.user.dto.UserResponseDTO;
@@ -10,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -91,5 +94,30 @@ class UserServiceTest {
 
         verify(userRepository).existsByEmail(requestDTO.getEmail());
         verifyNoMoreInteractions(userRepository, userMapper, passwordEncoder);
+    }
+
+    @Test
+    void shouldSetDeletedAt_whenUserExists() {
+        when(userRepository.findByIdAndDeletedAtIsNull(user.getId())).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+
+        userService.deleteUser(user.getId());
+
+        assertNotNull(user.getDeletedAt(), "deletedAt should be set");
+        verify(userRepository, times(1)).save(user); // verify save was called
+    }
+
+    @Test
+    void deleteUser_shouldThrowException_whenUserDoesNotExist() {
+        when(userRepository.findByIdAndDeletedAtIsNull(user.getId()))
+                .thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> userService.deleteUser(user.getId())
+        );
+
+        assertEquals("User not found", exception.getMessage());
+        verify(userRepository, never()).save(any()); // verifies save was never called
     }
 }

@@ -30,4 +30,10 @@ public class UserController {
         userService.updateUser(id, userUpdateDTO);
         return ResponseEntity.ok().body(Map.of("message", "User successfully updated"));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.ok().body(Map.of("message", "User successfully deleted"));
+    }
 }

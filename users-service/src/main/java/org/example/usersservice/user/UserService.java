@@ -10,6 +10,7 @@ import org.example.usersservice.user.dto.UserUpdateDTO;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,7 +57,12 @@ public class UserService {
 
         // update user
         userRepository.save(user);
+    }
 
-        return;
+    public void deleteUser(Long id) {
+        User user = userRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        user.setDeletedAt(Instant.now());
+        userRepository.save(user);
     }
 }
