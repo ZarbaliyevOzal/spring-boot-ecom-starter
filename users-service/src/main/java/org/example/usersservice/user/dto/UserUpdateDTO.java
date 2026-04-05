@@ -11,9 +11,9 @@ import org.example.usersservice.validation.annotation.FieldMatch;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@FieldMatch(field = "password",
-        fieldMatch = "passwordConfirmation",
-        message = "Passwords do not match")
+//@FieldMatch(field = "password",
+//        fieldMatch = "passwordConfirmation",
+//        message = "Passwords do not match")
 public class UserUpdateDTO {
 
     @NotBlank
@@ -25,10 +25,10 @@ public class UserUpdateDTO {
     @JsonProperty("last_name")
     private String lastName;
 
-    @Size(min = 8, max = 20)
-    private String password;
-
-    @Size(min = 8, max = 20)
-    @JsonProperty("password_confirmation")
-    private String passwordConfirmation;
+//    @Size(min = 8, max = 20)
+//    private String password;
+//
+//    @Size(min = 8, max = 20)
+//    @JsonProperty("password_confirmation")
+//    private String passwordConfirmation;
 }

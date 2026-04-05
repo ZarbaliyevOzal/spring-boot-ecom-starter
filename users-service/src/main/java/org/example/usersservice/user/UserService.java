@@ -1,5 +1,6 @@
 package org.example.usersservice.user;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.usersservice.exception.EntityNotFoundException;
@@ -7,6 +8,7 @@ import org.example.usersservice.exception.FieldValidationException;
 import org.example.usersservice.user.dto.UserRequestDTO;
 import org.example.usersservice.user.dto.UserResponseDTO;
 import org.example.usersservice.user.dto.UserUpdateDTO;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +25,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final KeycloakService keycloakService;
 
     public UserResponseDTO createUser(@Valid UserRequestDTO userRequestDTO) {
         Map<String, String> errors = new HashMap<>();
@@ -33,13 +36,23 @@ public class UserService {
         }
 
         User user = userMapper.toEntity(userRequestDTO);
-        // hash password
-        user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
+
         // save user
         User saved = userRepository.save(user);
+
+        // save user to keycloak
+        UserRepresentation keycloakUser = keycloakService.createUser(saved, userRequestDTO.getPassword());
+
+        // set user keycloak_id
+        saved.setKeycloakId(keycloakUser.getId());
+
+        // save user
+        userRepository.save(saved);
+
         return userMapper.toDTO(saved);
     }
 
+    @Transactional
     public void updateUser(Long id, @Valid UserUpdateDTO userUpdateDTO) {
         // find user
         User user = userRepository.findByIdAndDeletedAtIsNull(id)
@@ -53,18 +66,21 @@ public class UserService {
             user.setLastName(userUpdateDTO.getLastName());
         }
 
-        if (userUpdateDTO.getPassword() != null) {
-            user.setPassword(passwordEncoder.encode(userUpdateDTO.getPassword()));
-        }
-
         // update user
         userRepository.save(user);
+
+        // save keycloak user
+        keycloakService.updateUser(user);
     }
 
     public void deleteUser(Long id) {
         User user = userRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         user.setDeletedAt(Instant.now());
+
+        // set disable keycloak user
+        keycloakService.disableOrEnableUser(user, false);
+
         userRepository.save(user);
     }
 
@@ -72,6 +88,10 @@ public class UserService {
         User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
         if (user.getDeletedAt() == null) return;
         user.setDeletedAt(null);
+
+        // set disable keycloak user
+        keycloakService.disableOrEnableUser(user, true);
+
         userRepository.save(user);
     }
 

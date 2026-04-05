@@ -7,6 +7,7 @@ import org.example.usersservice.user.dto.UserResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,6 +30,8 @@ class UserServiceTest {
     @Mock
     private UserMapper userMapper;
 
+    @Mock KeycloakService keycloakService;
+
     @InjectMocks
     private UserService userService;
 
@@ -36,6 +39,7 @@ class UserServiceTest {
     private User user;
     private User savedUser;
     private UserResponseDTO responseDTO;
+    private UserRepresentation keycloakUser;
 
     @BeforeEach
     void setUp() {
@@ -48,10 +52,13 @@ class UserServiceTest {
 
         savedUser = new User();
         savedUser.setEmail("test@example.com");
-        savedUser.setPassword("encodedPassword");
+        savedUser.setKeycloakId("keycloak-id-123");
 
         responseDTO = new UserResponseDTO();
         responseDTO.setEmail("test@example.com");
+
+        keycloakUser = new UserRepresentation();
+        keycloakUser.setId("keycloak-id-123");
     }
 
     @Test
@@ -59,11 +66,10 @@ class UserServiceTest {
         // given
         when(userRepository.existsByEmail(requestDTO.getEmail())).thenReturn(false);
         when(userMapper.toEntity(requestDTO)).thenReturn(user);
-        when(passwordEncoder.encode(requestDTO.getPassword())).thenReturn("encodedPassword");
         when(userRepository.save(user)).thenReturn(savedUser);
         when(userMapper.toDTO(savedUser)).thenReturn(responseDTO);
+        when(keycloakService.createUser(savedUser, requestDTO.getPassword())).thenReturn(keycloakUser);
 
-        // when
         UserResponseDTO result = userService.createUser(requestDTO);
 
         // then
@@ -72,9 +78,9 @@ class UserServiceTest {
 
         verify(userRepository).existsByEmail(requestDTO.getEmail());
         verify(userMapper).toEntity(requestDTO);
-        verify(passwordEncoder).encode(requestDTO.getPassword());
         verify(userRepository).save(user);
         verify(userMapper).toDTO(savedUser);
+        verify(keycloakService).createUser(savedUser, requestDTO.getPassword());
     }
 
     @Test
@@ -100,11 +106,13 @@ class UserServiceTest {
     void shouldSetDeletedAt_whenUserExists() {
         when(userRepository.findByIdAndDeletedAtIsNull(user.getId())).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
+//        when(keycloakService.disableOrEnableUser(savedUser, false)).thenReturn(void);
 
         userService.deleteUser(user.getId());
 
         assertNotNull(user.getDeletedAt(), "deletedAt should be set");
         verify(userRepository, times(1)).save(user); // verify save was called
+        verify(keycloakService, times(1)).disableOrEnableUser(savedUser, false);
     }
 
     @Test

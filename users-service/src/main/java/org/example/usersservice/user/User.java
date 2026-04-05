@@ -28,8 +28,8 @@ public class User {
     @Column(unique = true, nullable = false, length = 255)
     private String email;
 
-    @Column(nullable = false, length = 255)
-    private String password;
+    @Column(unique = true, nullable = false, length = 255)
+    private String keycloakId;
 
     @Column(nullable = false, insertable = false, updatable = false)
     private Instant createdAt;
@@ -40,4 +40,6 @@ public class User {
     private Instant deletedAt;
 
     private Instant disabledAt;
+
+    private Instant emailVerifiedAt;
 }
