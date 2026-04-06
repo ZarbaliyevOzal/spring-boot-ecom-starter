@@ -1,5 +1,7 @@
 package org.example.product_service.handler;
 
+import org.example.product_service.exception.EntityNotFoundException;
+import org.example.product_service.exception.FieldValidationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,6 +28,19 @@ public class GlobalExceptionHandler {
         response.put("message", "Bad request");
         response.put("errors", errors);
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(FieldValidationException.class)
+    public ResponseEntity<Map<String, Object>> handleFieldValidation(FieldValidationException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Bad request");
+        response.put("errors", ex.getErrors());
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleEntityNotFoundException(EntityNotFoundException ex) {
+        return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
     }
 
 }
