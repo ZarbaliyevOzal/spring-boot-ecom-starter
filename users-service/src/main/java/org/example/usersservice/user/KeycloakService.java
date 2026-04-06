@@ -1,7 +1,6 @@
 package org.example.usersservice.user;
 
 import jakarta.ws.rs.core.Response;
-import lombok.RequiredArgsConstructor;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -9,7 +8,6 @@ import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.keycloak.representations.userprofile.config.UPConfig;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;

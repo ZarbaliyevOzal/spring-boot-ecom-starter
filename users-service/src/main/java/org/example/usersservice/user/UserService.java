@@ -8,10 +8,8 @@ import org.example.usersservice.exception.FieldValidationException;
 import org.example.usersservice.user.dto.UserRequestDTO;
 import org.example.usersservice.user.dto.UserResponseDTO;
 import org.example.usersservice.user.dto.UserUpdateDTO;
-import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -23,7 +21,6 @@ import java.util.Map;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final KeycloakService keycloakService;
 
@@ -110,9 +107,5 @@ public class UserService {
                     user.getLastName(),
                     user.getEmail()
             ));
-    }
-
-    public void createSuperAdminIfNotExists() {
-        
     }
 }

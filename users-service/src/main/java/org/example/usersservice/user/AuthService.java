@@ -5,7 +5,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.usersservice.exception.FieldValidationException;
 import org.example.usersservice.user.dto.UserRequestDTO;
-import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
