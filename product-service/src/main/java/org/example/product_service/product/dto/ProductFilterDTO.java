@@ -1,8 +1,6 @@
 package org.example.product_service.product.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
 
