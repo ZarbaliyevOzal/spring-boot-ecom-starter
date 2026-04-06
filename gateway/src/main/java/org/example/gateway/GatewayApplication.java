@@ -21,7 +21,9 @@ public class GatewayApplication {
 				.route(
 						"path_route",
 						r -> r
-								.path("/api/v1/users/**", "/api/v1/auth/**")
+								.path(
+										"/api/v1/users/**",
+										"/api/v1/auth/**")
 								.uri("http://localhost:10010")
 				)
 				.build();
