@@ -26,6 +26,11 @@ public class GatewayApplication {
 										"/api/v1/auth/**")
 								.uri("http://localhost:10010")
 				)
+				.route(
+						"path_route",
+						r -> r.path("/api/v1/products/**")
+								.uri("http://localhost:10011")
+				)
 				.build();
 	}
 
