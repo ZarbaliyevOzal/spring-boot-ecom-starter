@@ -31,7 +31,11 @@ public class AuthService {
         userRepository.save(user);
 
         // create keycloak user
-        UserRepresentation keycloakUser = keycloakService.createUser(user, userRequestDTO.getPassword());
+        String keycloakUserId = keycloakService.createUser(user, userRequestDTO.getPassword());
+
+        user.setKeycloakId(keycloakUserId);
+
+        userRepository.save(user);
 
         // todo: set user keycloak_id
 

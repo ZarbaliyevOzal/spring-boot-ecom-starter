@@ -41,10 +41,10 @@ public class UserService {
         User saved = userRepository.save(user);
 
         // save user to keycloak
-        UserRepresentation keycloakUser = keycloakService.createUser(saved, userRequestDTO.getPassword());
+        String keycloakUserId = keycloakService.createUser(saved, userRequestDTO.getPassword());
 
         // set user keycloak_id
-        saved.setKeycloakId(keycloakUser.getId());
+        saved.setKeycloakId(keycloakUserId);
 
         // save user
         userRepository.save(saved);
@@ -110,5 +110,9 @@ public class UserService {
                     user.getLastName(),
                     user.getEmail()
             ));
+    }
+
+    public void createSuperAdminIfNotExists() {
+        
     }
 }

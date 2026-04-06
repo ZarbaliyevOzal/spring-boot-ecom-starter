@@ -68,7 +68,7 @@ class UserServiceTest {
         when(userMapper.toEntity(requestDTO)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(savedUser);
         when(userMapper.toDTO(savedUser)).thenReturn(responseDTO);
-        when(keycloakService.createUser(savedUser, requestDTO.getPassword())).thenReturn(keycloakUser);
+        when(keycloakService.createUser(savedUser, requestDTO.getPassword())).thenReturn("keycloak-id-123");
 
         UserResponseDTO result = userService.createUser(requestDTO);
 

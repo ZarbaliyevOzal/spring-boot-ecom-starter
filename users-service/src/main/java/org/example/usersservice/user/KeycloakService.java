@@ -1,5 +1,6 @@
 package org.example.usersservice.user;
 
+import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
@@ -31,7 +32,7 @@ public class KeycloakService {
                 .build();
     }
 
-    public UserRepresentation createUser(User savedUser, String password) {
+    public String createUser(User savedUser, String password) {
         UserRepresentation user = new UserRepresentation();
         user.setUsername(savedUser.getEmail());
         user.setEmail(savedUser.getEmail());
@@ -47,10 +48,20 @@ public class KeycloakService {
 
         user.setCredentials(Collections.singletonList(credential));
 
-        keycloak.realm("ecom_starter").users().create(user);
-        System.out.println("User created: " + user.getId());
+        Response response = keycloak.realm("ecom_starter").users().create(user);
+        System.out.println("Keycloak User created");
 
-        return user;
+        String userId = null;
+
+        try {
+            String location = response.getHeaderString("Location");
+            userId = location.substring(location.lastIndexOf('/') + 1);
+            System.out.println("User created in Keycloak with ID: " + userId);
+        } finally {
+            response.close(); // VERY important
+        }
+
+        return userId;
     }
 
     public void updateUser(User savedUser) {
