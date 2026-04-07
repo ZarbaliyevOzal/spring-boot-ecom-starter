@@ -24,12 +24,17 @@ public class GatewayApplication {
 								.path(
 										"/api/v1/users/**",
 										"/api/v1/auth/**")
-								.uri("http://localhost:10010")
+								.uri("lb://users-service")
 				)
 				.route(
 						"path_route",
 						r -> r.path("/api/v1/products/**")
-								.uri("http://localhost:10011")
+								.uri("lb://product-service")
+				)
+				.route(
+						"path_route",
+						r -> r.path("/api/v1/orders/**")
+								.uri("lb://order-service")
 				)
 				.build();
 	}
