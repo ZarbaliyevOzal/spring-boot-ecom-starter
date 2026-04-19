@@ -3,6 +3,7 @@ package org.example.order_service.handler;
 import org.example.order_service.exception.EntityNotFoundException;
 import org.example.order_service.exception.FieldValidationException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -41,5 +42,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleEntityNotFoundException(EntityNotFoundException ex) {
         return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleParseError(HttpMessageNotReadableException ex) {
+        return ResponseEntity.badRequest().body(Map.of("message","Invalid request format"));
     }
 }
